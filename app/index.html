@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Buena Mesa - Restaurante</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <span class="logo-icon">&#127860;</span>
+        <h1>La Buena Mesa</h1>
+      </div>
+      <div class="header-actions">
+        <div class="search-container">
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar platos...">
+          <span class="search-icon">&#128269;</span>
+        </div>
+        <button id="cartToggle" class="cart-btn">
+          <span class="cart-icon">&#128722;</span>
+          <span id="cartCount" class="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+    <nav class="categories-nav">
+      <div class="categories-container" id="categoriesContainer">
+      </div>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="menu-section">
+      <div class="menu-header">
+        <h2 id="categoryTitle">Todos los platos</h2>
+        <span id="menuCount" class="menu-count"></span>
+      </div>
+      <div id="menuGrid" class="menu-grid">
+      </div>
+    </section>
+  </main>
+
+  <div id="cartSidebar" class="cart-sidebar">
+    <div class="cart-header">
+      <h3>Tu Pedido</h3>
+      <button id="closeCart" class="close-btn">&times;</button>
+    </div>
+    <div id="cartItems" class="cart-items">
+      <div class="cart-empty">
+        <span class="empty-icon">&#128722;</span>
+        <p>Tu carrito está vacío</p>
+        <span class="empty-hint">Agrega platos deliciosos</span>
+      </div>
+    </div>
+    <div id="cartFooter" class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal" class="total-amount">$0.00</span>
+      </div>
+      <button id="checkoutBtn" class="checkout-btn" disabled>Confirmar Pedido</button>
+    </div>
+  </div>
+
+  <div id="cartOverlay" class="cart-overlay"></div>
+
+  <div id="checkoutModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Confirmar Pedido</h3>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <form id="checkoutForm" class="checkout-form">
+        <div class="form-group">
+          <label for="customerName">Nombre del cliente</label>
+          <input type="text" id="customerName" required placeholder="Ej: Juan Pérez">
+        </div>
+        <div class="form-group">
+          <label for="tableNumber">Número de mesa</label>
+          <input type="number" id="tableNumber" required min="1" max="50" placeholder="Ej: 5">
+        </div>
+        <div class="form-group">
+          <label for="orderNotes">Notas adicionales (opcional)</label>
+          <textarea id="orderNotes" rows="3" placeholder="Sin cebolla, extra salsa..."></textarea>
+        </div>
+        <div class="order-summary">
+          <h4>Resumen del pedido</h4>
+          <div id="orderSummaryItems" class="summary-items"></div>
+          <div class="summary-total">
+            <span>Total a pagar:</span>
+            <span id="summaryTotal" class="summary-amount">$0.00</span>
+          </div>
+        </div>
+        <button type="submit" class="confirm-btn">Enviar Pedido</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="successModal" class="modal">
+    <div class="modal-content success-content">
+      <div class="success-icon">&#9989;</div>
+      <h3>¡Pedido Confirmado!</h3>
+      <p id="successMessage"></p>
+      <button id="closeSuccess" class="confirm-btn">Aceptar</button>
+    </div>
+  </div>
+
+  <button id="ordersHistoryBtn" class="history-btn" title="Ver pedidos anteriores">
+    <span>&#128203;</span>
+  </button>
+
+  <div id="ordersModal" class="modal">
+    <div class="modal-content orders-content">
+      <div class="modal-header">
+        <h3>Historial de Pedidos</h3>
+        <button id="closeOrders" class="close-btn">&times;</button>
+      </div>
+      <div id="ordersList" class="orders-list">
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
