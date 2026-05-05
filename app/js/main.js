@@ -1,0 +1,455 @@
+(function() {
+  'use strict';
+
+  let cart = [];
+  let currentCategory = 'Todos';
+  let searchQuery = '';
+  let currentOrderFilter = 'all';
+  let currentReservationFilter = 'all';
+
+  const formatCOP = (amount) => `$${Math.round(amount).toLocaleString('es-CO')}`;
+
+  function init() {
+    if (Auth.init()) {
+      showMainView();
+    } else {
+      showLoginView();
+    }
+    setupEventListeners();
+  }
+
+  function showLoginView() {
+    document.getElementById('loginView').classList.add('active');
+    document.getElementById('mainView').classList.remove('active');
+  }
+
+  function showMainView() {
+    document.getElementById('loginView').classList.remove('active');
+    document.getElementById('mainView').classList.add('active');
+    updateUserInfo();
+    setupNavigation();
+    loadMenuView();
+  }
+
+  function updateUserInfo() {
+    const userInfo = document.getElementById('userInfo');
+    if (Auth.currentUser) {
+      userInfo.innerHTML = `<span>${Auth.currentUser.name} (${Auth.currentUser.role})</span>`;
+    }
+    const adminElements = document.querySelectorAll('.admin-only');
+    adminElements.forEach(el => {
+      el.style.display = Auth.hasRole('admin') ? 'block' : 'none';
+    });
+  }
+
+  function setupNavigation() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const viewId = btn.dataset.view;
+        switchView(viewId);
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  }
+
+  function switchView(viewId) {
+    document.querySelectorAll('.content-view').forEach(v => v.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+
+    switch(viewId) {
+      case 'menuView': loadMenuView(); break;
+      case 'ordersView': loadOrdersView(); break;
+      case 'reservationsView': loadReservationsView(); break;
+      case 'menuAdminView': loadMenuAdminView(); break;
+      case 'reportsView': loadReportsView(); break;
+    }
+  }
+
+  function loadMenuView() {
+    renderCategories();
+    renderMenu();
+    setupCart();
+  }
+
+  function renderCategories() {
+    const categories = ['Todos', ...Menu.getCategories()];
+    const container = document.getElementById('categoriesContainer');
+    container.innerHTML = categories.map(cat => `
+      <button class="category-btn ${cat === currentCategory ? 'active' : ''}" data-category="${cat}">${cat}</button>
+    `).join('');
+
+    container.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentCategory = btn.dataset.category;
+        renderCategories();
+        renderMenu();
+      });
+    });
+  }
+
+  function renderMenu() {
+    const menuData = Menu.getMenu();
+    const filtered = menuData.filter(item => {
+      const matchCategory = currentCategory === 'Todos' || item.category === currentCategory;
+      const matchSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCategory && matchSearch && item.available;
+    });
+
+    const grid = document.getElementById('menuGrid');
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="no-results"><span>&#128533;</span><p>No se encontraron platos</p></div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map((item, index) => `
+      <div class="dish-card" style="animation-delay: ${index * 0.08}s">
+        <div class="image-container">
+          <img src="${item.image}" alt="${item.name}" class="dish-image" loading="lazy">
+          <span class="dish-category-tag">${item.category}</span>
+        </div>
+        <div class="dish-content">
+          <div class="dish-header">
+            <h3 class="dish-name">${item.name}</h3>
+            <span class="dish-price">${formatCOP(item.price)}</span>
+          </div>
+          <p class="dish-description">${item.description}</p>
+          <button class="add-btn" data-id="${item.id}">Agregar al pedido</button>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.add-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addToCart(parseInt(btn.dataset.id));
+        btn.textContent = '¡Agregado!';
+        setTimeout(() => btn.textContent = 'Agregar al pedido', 1500);
+      });
+    });
+  }
+
+  function addToCart(id) {
+    const item = Menu.getMenu().find(d => d.id === id);
+    if (!item) return;
+    const existing = cart.find(c => c.id === id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      cart.push({ ...item, quantity: 1 });
+    }
+    saveCart();
+    updateCartUI();
+  }
+
+  function setupCart() {
+    const cartToggle = document.getElementById('cartToggle');
+    const closeCart = document.getElementById('closeCart');
+    const cartOverlay = document.getElementById('cartOverlay');
+
+    if (cartToggle) {
+      cartToggle.addEventListener('click', () => {
+        document.getElementById('cartSidebar').classList.add('open');
+        cartOverlay.classList.add('open');
+      });
+    }
+
+    if (closeCart) {
+      closeCart.addEventListener('click', closeCartSidebar);
+    }
+    if (cartOverlay) {
+      cartOverlay.addEventListener('click', closeCartSidebar);
+    }
+  }
+
+  function closeCartSidebar() {
+    document.getElementById('cartSidebar').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+  }
+
+  function updateCartUI() {
+    const cartCount = document.getElementById('cartCount');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartItems = document.getElementById('cartItems');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    if (!cartCount) return;
+
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    cartCount.textContent = totalItems;
+    cartTotal.textContent = formatCOP(totalPrice);
+    checkoutBtn.disabled = cart.length === 0;
+
+    if (cart.length === 0) {
+      cartItems.innerHTML = '<div class="cart-empty"><span>&#128722;</span><p>Tu carrito está vacío</p></div>';
+      return;
+    }
+
+    cartItems.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-details">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${formatCOP(item.price * item.quantity)}</div>
+          <div class="cart-item-controls">
+            <button class="qty-btn" onclick="window.changeQty(${item.id}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button class="qty-btn" onclick="window.changeQty(${item.id}, 1)">+</button>
+          </div>
+        </div>
+        <button class="remove-btn" onclick="window.removeFromCart(${item.id})">&times;</button>
+      </div>
+    `).join('');
+  }
+
+  window.changeQty = function(id, change) {
+    const item = cart.find(c => c.id === id);
+    if (!item) return;
+    item.quantity += change;
+    if (item.quantity <= 0) {
+      cart = cart.filter(c => c.id !== id);
+    }
+    saveCart();
+    updateCartUI();
+  };
+
+  window.removeFromCart = function(id) {
+    cart = cart.filter(c => c.id !== id);
+    saveCart();
+    updateCartUI();
+  };
+
+  function saveCart() {
+    localStorage.setItem('restaurantCart', JSON.stringify(cart));
+  }
+
+  function loadOrdersView() {
+    Orders.init();
+    renderOrders();
+
+    document.querySelectorAll('.order-filters .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentOrderFilter = btn.dataset.filter;
+        document.querySelectorAll('.order-filters .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderOrders();
+      });
+    });
+  }
+
+  function renderOrders() {
+    const orders = Orders.getOrders({ status: currentOrderFilter });
+    const container = document.getElementById('ordersList');
+
+    if (orders.length === 0) {
+      container.innerHTML = '<div class="no-orders"><p>No hay pedidos</p></div>';
+      return;
+    }
+
+    container.innerHTML = orders.map(order => `
+      <div class="order-card status-${order.status}">
+        <div class="order-header">
+          <strong>Pedido #${order.id}</strong>
+          <span class="status-badge ${order.status}">${getStatusText(order.status)}</span>
+        </div>
+        <div class="order-info">Mesa ${order.table} - ${order.customer}</div>
+        <div class="order-items">${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
+        <div class="order-total">${formatCOP(order.total)}</div>
+        ${Auth.hasAnyRole(['mesero', 'admin']) ? renderOrderActions(order) : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderOrderActions(order) {
+    const actions = [];
+    if (order.status === 'pending') {
+      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'preparing')">Iniciar Preparación</button>`);
+    } else if (order.status === 'preparing') {
+      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'ready')">Marcar Listo</button>`);
+    } else if (order.status === 'ready') {
+      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'delivered')">Entregar</button>`);
+    }
+    return `<div class="order-actions">${actions.join('')}</div>`;
+  }
+
+  window.updateOrderStatus = function(orderId, newStatus) {
+    Orders.updateStatus(orderId, newStatus);
+    renderOrders();
+  };
+
+  function getStatusText(status) {
+    const texts = { pending: 'Pendiente', preparing: 'En Preparación', ready: 'Listo', delivered: 'Entregado', cancelled: 'Cancelado' };
+    return texts[status] || status;
+  }
+
+  function loadReservationsView() {
+    Reservations.init();
+    renderReservations();
+  }
+
+  function renderReservations() {
+    const reservations = Reservations.getReservations({ status: currentReservationFilter });
+    const container = document.getElementById('reservationsList');
+
+    if (reservations.length === 0) {
+      container.innerHTML = '<div class="no-orders"><p>No hay reservas</p></div>';
+      return;
+    }
+
+    container.innerHTML = reservations.map(res => `
+      <div class="reservation-card status-${res.status}">
+        <div class="reservation-header">
+          <strong>${res.customer}</strong>
+          <span class="status-badge ${res.status}">${res.status}</span>
+        </div>
+        <div class="reservation-details">
+          <span>&#128197; ${res.date}</span>
+          <span>&#128336; ${res.time}</span>
+          <span>&#128101; ${res.guests} personas</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function loadMenuAdminView() {
+    if (!Auth.hasRole('admin')) return;
+    renderAdminMenu();
+  }
+
+  function renderAdminMenu() {
+    const menu = Menu.getMenu();
+    const container = document.getElementById('adminMenuList');
+
+    container.innerHTML = menu.map(item => `
+      <div class="admin-dish-card">
+        <img src="${item.image}" alt="${item.name}" class="admin-dish-image">
+        <div class="admin-dish-info">
+          <h4>${item.name}</h4>
+          <p>${item.category} - ${formatCOP(item.price)}</p>
+          <p>${item.description}</p>
+        </div>
+        <div class="admin-dish-actions">
+          <button onclick="toggleDishAvailability(${item.id})">${item.available ? 'Desactivar' : 'Activar'}</button>
+          <button onclick="deleteDish(${item.id})">Eliminar</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.toggleDishAvailability = function(id) {
+    Menu.toggleAvailability(id);
+    renderAdminMenu();
+  };
+
+  window.deleteDish = function(id) {
+    if (confirm('¿Está seguro de eliminar este plato?')) {
+      Menu.deleteDish(id);
+      renderAdminMenu();
+    }
+  };
+
+  function loadReportsView() {
+    if (!Auth.hasRole('admin')) return;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reportStartDate').value = today;
+    document.getElementById('reportEndDate').value = today;
+  }
+
+  function setupEventListeners() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const result = Auth.login(username, password);
+        if (result.success) {
+          showMainView();
+        } else {
+          document.getElementById('loginError').textContent = result.message;
+        }
+      });
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        Auth.logout();
+        cart = [];
+        showLoginView();
+      });
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderMenu();
+      });
+    }
+
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) return;
+        showCheckoutModal();
+      });
+    }
+  }
+
+  function showCheckoutModal() {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+
+    modalTitle.textContent = 'Confirmar Pedido';
+    modalBody.innerHTML = `
+      <form id="checkoutForm">
+        <div class="form-group">
+          <label>Nombre del cliente</label>
+          <input type="text" id="customerName" required>
+        </div>
+        <div class="form-group">
+          <label>Número de mesa</label>
+          <input type="number" id="tableNumber" required min="1" max="50">
+        </div>
+        <div class="form-group">
+          <label>Notas adicionales</label>
+          <textarea id="orderNotes" rows="3"></textarea>
+        </div>
+        <div class="order-summary">
+          <h4>Resumen</h4>
+          ${cart.map(i => `<div>${i.quantity}x ${i.name} - ${formatCOP(i.price * i.quantity)}</div>`).join('')}
+          <div class="total">Total: ${formatCOP(cart.reduce((s, i) => s + i.price * i.quantity, 0))}</div>
+        </div>
+        <button type="submit" class="confirm-btn">Confirmar Pedido</button>
+      </form>
+    `;
+
+    modal.classList.add('open');
+
+    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const order = Orders.create({
+        customer: document.getElementById('customerName').value,
+        table: document.getElementById('tableNumber').value,
+        notes: document.getElementById('orderNotes').value,
+        items: [...cart],
+        total: cart.reduce((s, i) => s + i.price * i.quantity, 0)
+      });
+
+      cart = [];
+      saveCart();
+      updateCartUI();
+      closeCartSidebar();
+      modal.classList.remove('open');
+      alert('Pedido #' + order.id + ' creado exitosamente');
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      modal.classList.remove('open');
+    });
+  }
+
+  init();
+})();

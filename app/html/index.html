@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Buena Mesa - Restaurante</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Exquisito al Paladar - Restaurante</title>
+  <link rel="stylesheet" href="../css/styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -12,9 +12,10 @@
     <div class="header-content">
       <div class="logo">
         <span class="logo-icon">&#127860;</span>
-        <h1>La Buena Mesa</h1>
+        <h1>Exquisito al Paladar</h1>
       </div>
       <div class="header-actions">
+        <div id="userInfo" class="user-welcome"></div>
         <div class="search-container">
           <input type="text" id="searchInput" class="search-input" placeholder="Buscar platos...">
           <span class="search-icon">&#128269;</span>
@@ -26,8 +27,7 @@
       </div>
     </div>
     <nav class="categories-nav">
-      <div class="categories-container" id="categoriesContainer">
-      </div>
+      <div class="categories-container" id="categoriesContainer"></div>
     </nav>
   </header>
 
@@ -37,8 +37,7 @@
         <h2 id="categoryTitle">Todos los platos</h2>
         <span id="menuCount" class="menu-count"></span>
       </div>
-      <div id="menuGrid" class="menu-grid">
-      </div>
+      <div id="menuGrid" class="menu-grid"></div>
     </section>
   </main>
 
@@ -47,13 +46,7 @@
       <h3>Tu Pedido</h3>
       <button id="closeCart" class="close-btn">&times;</button>
     </div>
-    <div id="cartItems" class="cart-items">
-      <div class="cart-empty">
-        <span class="empty-icon">&#128722;</span>
-        <p>Tu carrito está vacío</p>
-        <span class="empty-hint">Agrega platos deliciosos</span>
-      </div>
-    </div>
+    <div id="cartItems" class="cart-items"></div>
     <div id="cartFooter" class="cart-footer">
       <div class="cart-total">
         <span>Total:</span>
@@ -62,7 +55,6 @@
       <button id="checkoutBtn" class="checkout-btn" disabled>Confirmar Pedido</button>
     </div>
   </div>
-
   <div id="cartOverlay" class="cart-overlay"></div>
 
   <div id="checkoutModal" class="modal">
@@ -110,17 +102,81 @@
     <span>&#128203;</span>
   </button>
 
+  <button id="loginBtn" class="login-float-btn" title="Iniciar Sesión">
+    <span>&#128100;</span>
+  </button>
+
+  <button id="registerBtn" class="register-float-btn" title="Registrarse">
+    <span>&#128221;</span>
+  </button>
+
   <div id="ordersModal" class="modal">
     <div class="modal-content orders-content">
       <div class="modal-header">
         <h3>Historial de Pedidos</h3>
         <button id="closeOrders" class="close-btn">&times;</button>
       </div>
-      <div id="ordersList" class="orders-list">
-      </div>
+      <div id="ordersList" class="orders-list"></div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="loginModal" class="modal">
+    <div class="modal-content login-modal-content">
+      <div class="modal-header">
+        <h3>Iniciar Sesión</h3>
+        <button id="closeLogin" class="close-btn">&times;</button>
+      </div>
+      <form id="loginForm" class="login-form">
+        <input type="text" id="loginUser" placeholder="Usuario" required>
+        <input type="password" id="loginPass" placeholder="Contraseña" required>
+        <button type="submit">Iniciar Sesión</button>
+        <div id="loginError" class="error-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal">
+    <div class="modal-content login-modal-content">
+      <div class="modal-header">
+        <h3>Registrarse</h3>
+        <button id="closeRegister" class="close-btn">&times;</button>
+      </div>
+      <form id="registerForm" class="login-form">
+        <input type="text" id="regUser" placeholder="Usuario" required>
+        <input type="password" id="regPass" placeholder="Contraseña" required>
+        <select id="regRole">
+          <option value="cliente">Cliente</option>
+          <option value="mesero">Mesero</option>
+        </select>
+        <button type="submit">Registrarse</button>
+        <div id="registerError" class="error-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Exquisito al Paladar</h3>
+        <div class="contact-info">
+          <p><span class="footer-icon">&#128205;</span> Av. Principal #123, Ciudad</p>
+          <p><span class="footer-icon">&#128222;</span> +1 234 567 890</p>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Síguenos</h4>
+        <div class="social-links">
+          <a href="#" class="social-link" title="Facebook">&#120133;</a>
+          <a href="#" class="social-link" title="Instagram">&#128247;</a>
+          <a href="#" class="social-link" title="Twitter">&#120143;</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Exquisito al Paladar. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="../js/script.js"></script>
 </body>
 </html>

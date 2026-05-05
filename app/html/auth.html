@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exquisito al Paladar - Iniciar Sesión</title>
+  <link rel="stylesheet" href="../css/auth.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <span class="auth-logo">&#127860;</span>
+        <h1>Exquisito al Paladar</h1>
+        <p class="auth-subtitle">Sistema de Gestión de Restaurante</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Iniciar Sesión</button>
+        <button class="auth-tab" data-tab="register">Registrarse</button>
+      </div>
+
+      <div class="auth-forms">
+        <form id="loginForm" class="auth-form active">
+          <div class="form-group">
+            <label for="loginEmail">Correo electrónico</label>
+            <input type="email" id="loginEmail" required placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <input type="password" id="loginPassword" required placeholder="Tu contraseña">
+          </div>
+          <div id="loginError" class="error-message"></div>
+          <button type="submit" class="auth-btn">Iniciar Sesión</button>
+          <div class="demo-accounts">
+            <p><strong>Cuentas de demostración:</strong></p>
+            <p>Admin: admin@restaurante.com / admin123</p>
+            <p>Mesero: mesero@restaurante.com / mesero123</p>
+            <p>Cliente: cliente@restaurante.com / cliente123</p>
+          </div>
+        </form>
+
+        <form id="registerForm" class="auth-form">
+          <div class="form-group">
+            <label for="registerName">Nombre completo</label>
+            <input type="text" id="registerName" required placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label for="registerEmail">Correo electrónico</label>
+            <input type="email" id="registerEmail" required placeholder="tu@email.com">
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Contraseña</label>
+            <input type="password" id="registerPassword" required placeholder="Mínimo 6 caracteres" minlength="6">
+          </div>
+          <div class="form-group">
+            <label for="registerRole">Tipo de cuenta</label>
+            <select id="registerRole">
+              <option value="cliente">Cliente</option>
+              <option value="mesero">Mesero</option>
+            </select>
+          </div>
+          <div id="registerError" class="error-message"></div>
+          <div id="registerSuccess" class="success-message"></div>
+          <button type="submit" class="auth-btn">Crear Cuenta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/auth-handler.js"></script>
+</body>
+</html>

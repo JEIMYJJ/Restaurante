@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exquisito al Paladar - Sistema de Restaurante</title>
+  <link rel="stylesheet" href="app/css/styles.css">
+  <link rel="stylesheet" href="app/css/modules/auth.css">
+  <link rel="stylesheet" href="app/css/modules/menu.css">
+  <link rel="stylesheet" href="app/css/modules/orders.css">
+  <link rel="stylesheet" href="app/css/modules/reservations.css">
+  <link rel="stylesheet" href="app/css/modules/reports.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <div id="loginView" class="view active">
+      <div class="login-container">
+        <div class="login-header">
+          <span class="logo-icon">&#127860;</span>
+          <h1>Exquisito al Paladar</h1>
+          <p>Sistema de Gestión de Restaurante</p>
+        </div>
+        <form id="loginForm" class="login-form">
+          <div class="form-group">
+            <label for="username">Usuario</label>
+            <input type="text" id="username" required placeholder="Ingrese su usuario">
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" required placeholder="Ingrese su contraseña">
+          </div>
+          <button type="submit" class="login-btn">Iniciar Sesión</button>
+          <div id="loginError" class="error-message"></div>
+        </form>
+        <div class="login-hint">
+          <p><strong>Usuarios demo:</strong></p>
+          <p>Admin: admin / admin123</p>
+          <p>Mesero: mesero / mesero123</p>
+          <p>Cliente: cliente / cliente123</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="mainView" class="view">
+      <header class="header">
+        <div class="header-content">
+          <div class="logo">
+            <span class="logo-icon">&#127860;</span>
+            <h1>Exquisito al Paladar</h1>
+          </div>
+          <div class="header-actions">
+            <div id="userInfo" class="user-info"></div>
+            <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+          </div>
+        </div>
+        <nav class="main-nav">
+          <button class="nav-btn active" data-view="menuView">Menú</button>
+          <button class="nav-btn" data-view="ordersView">Pedidos</button>
+          <button class="nav-btn" data-view="reservationsView">Reservas</button>
+          <button class="nav-btn admin-only" data-view="menuAdminView">Admin Menú</button>
+          <button class="nav-btn admin-only" data-view="reportsView">Reportes</button>
+        </nav>
+      </header>
+
+      <main class="main">
+        <div id="menuView" class="content-view active">
+          <div class="view-header">
+            <h2>Menú del Restaurante</h2>
+            <div class="search-container">
+              <input type="text" id="searchInput" class="search-input" placeholder="Buscar platos...">
+              <span class="search-icon">&#128269;</span>
+            </div>
+          </div>
+          <div class="categories-nav">
+            <div id="categoriesContainer" class="categories-container"></div>
+          </div>
+          <div id="menuGrid" class="menu-grid"></div>
+        </div>
+
+        <div id="ordersView" class="content-view">
+          <div class="view-header">
+            <h2>Gestión de Pedidos</h2>
+            <div class="order-filters">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="pending">Pendientes</button>
+              <button class="filter-btn" data-filter="preparing">En Preparación</button>
+              <button class="filter-btn" data-filter="ready">Listos</button>
+              <button class="filter-btn" data-filter="delivered">Entregados</button>
+            </div>
+          </div>
+          <div id="ordersList" class="orders-list"></div>
+        </div>
+
+        <div id="reservationsView" class="content-view">
+          <div class="view-header">
+            <h2>Sistema de Reservas</h2>
+            <button id="newReservationBtn" class="action-btn">Nueva Reserva</button>
+          </div>
+          <div class="reservation-filters">
+            <input type="date" id="reservationDateFilter" class="date-filter">
+            <button class="filter-btn active" data-filter="all">Todas</button>
+            <button class="filter-btn" data-filter="pending">Pendientes</button>
+            <button class="filter-btn" data-filter="confirmed">Confirmadas</button>
+            <button class="filter-btn" data-filter="cancelled">Canceladas</button>
+          </div>
+          <div id="reservationsList" class="reservations-list"></div>
+        </div>
+
+        <div id="menuAdminView" class="content-view">
+          <div class="view-header">
+            <h2>Administración de Menú</h2>
+            <button id="addDishBtn" class="action-btn">Agregar Plato</button>
+          </div>
+          <div id="adminMenuList" class="admin-menu-list"></div>
+        </div>
+
+        <div id="reportsView" class="content-view">
+          <div class="view-header">
+            <h2>Reportes y Cierre de Caja</h2>
+            <div class="report-actions">
+              <button id="generateReportBtn" class="action-btn">Generar Reporte</button>
+              <button id="closeCashBtn" class="action-btn danger">Cerrar Caja</button>
+            </div>
+          </div>
+          <div id="reportFilters" class="report-filters">
+            <label>Desde: <input type="date" id="reportStartDate"></label>
+            <label>Hasta: <input type="date" id="reportEndDate"></label>
+            <button id="applyFilterBtn" class="filter-btn">Aplicar</button>
+          </div>
+          <div id="reportResults" class="report-results"></div>
+        </div>
+      </main>
+
+      <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+          <h3>Mi Pedido</h3>
+          <button id="closeCart" class="close-btn">&times;</button>
+        </div>
+        <div id="cartItems" class="cart-items"></div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartTotal" class="total-amount">$0.00</span>
+          </div>
+          <button id="checkoutBtn" class="checkout-btn" disabled>Confirmar Pedido</button>
+        </div>
+      </div>
+      <div id="cartOverlay" class="cart-overlay"></div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle"></h3>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app/js/auth.js"></script>
+  <script src="app/js/menu.js"></script>
+  <script src="app/js/orders.js"></script>
+  <script src="app/js/reservations.js"></script>
+  <script src="app/js/reports.js"></script>
+  <script src="app/js/main.js"></script>
+</body>
+</html>

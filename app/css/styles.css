@@ -14,8 +14,8 @@
   --dark-light: #457b9d;
   --light: #f1faee;
   --white: #ffffff;
-  --gray-100: #f8f9fa;
-  --gray-200: #e9ecef;
+  --gray-100: #d6eaf8;
+  --gray-200: #d1ecf1;
   --gray-300: #dee2e6;
   --gray-500: #adb5bd;
   --gray-700: #495057;
@@ -769,6 +769,52 @@ body {
   background: var(--dark-light);
 }
 
+/* Login Float Button */
+.login-float-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 7rem;
+  width: 50px;
+  height: 50px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+}
+
+.login-float-btn:hover {
+  transform: scale(1.1);
+  background: var(--primary-dark);
+}
+
+/* Register Float Button */
+.register-float-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 12rem;
+  width: 50px;
+  height: 50px;
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+}
+
+.register-float-btn:hover {
+  transform: scale(1.1);
+  background: #e68a00;
+}
+
 /* Orders Modal */
 .orders-content {
   max-width: 600px;
@@ -818,8 +864,279 @@ body {
   padding: 2rem;
 }
 
+/* Footer */
+.footer {
+  background: var(--dark);
+  color: var(--white);
+  padding: 3rem 1.5rem 1rem;
+  margin-top: 3rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--dark-light);
+}
+
+.footer-section h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-section h4 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-info p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.footer-icon {
+  font-size: 1.1rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--dark-light);
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 1.3rem;
+  transition: var(--transition);
+}
+
+.social-link:hover {
+  background: var(--primary);
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 1.5rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* Login Float Button */
+.login-float-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 10.5rem;
+  width: 50px;
+  height: 50px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+}
+
+.login-float-btn:hover {
+  transform: scale(1.1);
+  background: var(--primary-dark);
+}
+
+/* Register Float Button */
+.register-float-btn {
+  position: fixed;
+  bottom: 2rem;
+  right: 7rem;
+  width: 50px;
+  height: 50px;
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+}
+
+.register-float-btn:hover {
+  transform: scale(1.1);
+  background: #e68a00;
+}
+
+/* Login Modal */
+.login-modal-content {
+  max-width: 400px;
+}
+
+.login-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-form input,
+.login-form select {
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.login-form input:focus,
+.login-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.login-form button {
+  padding: 0.75rem;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background: var(--primary-dark);
+}
+
+.error-msg {
+  color: var(--primary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.user-welcome {
+  font-weight: 600;
+  color: var(--dark);
+  margin-right: 1rem;
+}
+
+.logout-btn-header {
+  padding: 0.5rem 1rem;
+  background: var(--gray-300);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+/* Login Modal */
+.login-modal-content {
+  max-width: 400px;
+}
+
+.login-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-form input,
+.login-form select {
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.login-form input:focus,
+.login-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.login-form button {
+  padding: 0.75rem;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background: var(--primary-dark);
+}
+
+.error-msg {
+  color: var(--primary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.user-welcome {
+  font-weight: 600;
+  color: var(--dark);
+  margin-right: 1rem;
+}
+
+.logout-btn-header {
+  padding: 0.5rem 1rem;
+  background: var(--gray-300);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .login-float-btn {
+    right: 9rem;
+  }
+
+  .register-float-btn {
+    right: 5.5rem;
+  }
+}
+  .login-float-btn {
+    right: 9rem;
+  }
+
+  .register-float-btn {
+    right: 5.5rem;
+  }
+}
   .header-content {
     flex-wrap: wrap;
   }
@@ -858,6 +1175,10 @@ body {
 
   .menu-header h2 {
     font-size: 1.4rem;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
   }
 }
 
