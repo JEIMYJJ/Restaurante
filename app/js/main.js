@@ -5,17 +5,23 @@
   let currentCategory = 'Todos';
   let searchQuery = '';
   let currentOrderFilter = 'all';
+  let currentOrderSearch = '';
   let currentReservationFilter = 'all';
+  let lastOrderCount = 0;
+  let removeRealtimeListener = null;
 
   const formatCOP = (amount) => `$${Math.round(amount).toLocaleString('es-CO')}`;
 
   function init() {
-    if (Auth.init()) {
+    Orders.init();
+    lastOrderCount = Orders.getPendingCount();
+    if (Auth.checkAuth()) {
       showMainView();
     } else {
       showLoginView();
     }
     setupEventListeners();
+    setupRealtimeOrders();
   }
 
   function showLoginView() {
@@ -28,6 +34,7 @@
     document.getElementById('mainView').classList.add('active');
     updateUserInfo();
     setupNavigation();
+    updateKitchenBadge();
     loadMenuView();
   }
 
@@ -38,7 +45,12 @@
     }
     const adminElements = document.querySelectorAll('.admin-only');
     adminElements.forEach(el => {
-      el.style.display = Auth.hasRole('admin') ? 'block' : 'none';
+      el.style.display = Auth.hasRole('admin') ? '' : 'none';
+    });
+
+    const meseroElements = document.querySelectorAll('.mesero-only');
+    meseroElements.forEach(el => {
+      el.style.display = Auth.hasAnyRole(['mesero', 'admin']) ? '' : 'none';
     });
   }
 
@@ -60,6 +72,7 @@
     switch(viewId) {
       case 'menuView': loadMenuView(); break;
       case 'ordersView': loadOrdersView(); break;
+      case 'kitchenView': loadKitchenView(); break;
       case 'reservationsView': loadReservationsView(); break;
       case 'menuAdminView': loadMenuAdminView(); break;
       case 'reportsView': loadReportsView(); break;
@@ -238,7 +251,7 @@
   }
 
   function renderOrders() {
-    const orders = Orders.getOrders({ status: currentOrderFilter });
+    const orders = Orders.getOrders({ status: currentOrderFilter, search: currentOrderSearch });
     const container = document.getElementById('ordersList');
 
     if (orders.length === 0) {
@@ -246,40 +259,301 @@
       return;
     }
 
-    container.innerHTML = orders.map(order => `
-      <div class="order-card status-${order.status}">
+    container.innerHTML = orders.map(order => renderOrderCard(order)).join('');
+  }
+
+  function renderOrderCard(order) {
+    const itemsText = order.items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+    const timeAgo = getTimeAgo(order.createdAt);
+
+    return `
+      <div class="order-card status-${order.status}" onclick="window.showOrderDetail(${order.id})" style="cursor:pointer">
         <div class="order-header">
           <strong>Pedido #${order.id}</strong>
-          <span class="status-badge ${order.status}">${getStatusText(order.status)}</span>
+          <div>
+            <span class="order-time" style="font-size:0.75rem;color:var(--gray-500);margin-right:0.5rem">${timeAgo}</span>
+            <span class="status-badge ${order.status}">${getStatusText(order.status)}</span>
+          </div>
         </div>
         <div class="order-info">Mesa ${order.table} - ${order.customer}</div>
-        <div class="order-items">${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</div>
+        <div class="order-items">${itemsText}</div>
         <div class="order-total">${formatCOP(order.total)}</div>
         ${Auth.hasAnyRole(['mesero', 'admin']) ? renderOrderActions(order) : ''}
       </div>
-    `).join('');
+    `;
+  }
+
+  function getTimeAgo(dateStr) {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diff = Math.floor((now - date) / 60000);
+    if (diff < 1) return 'Ahora';
+    if (diff < 60) return `${diff} min`;
+    const hours = Math.floor(diff / 60);
+    return `${hours}h ${diff % 60}m`;
   }
 
   function renderOrderActions(order) {
-    const actions = [];
+    let actions = [];
     if (order.status === 'pending') {
-      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'preparing')">Iniciar Preparación</button>`);
+      actions.push(`<button onclick="event.stopPropagation();window.updateOrderStatus(${order.id}, 'preparing')">Iniciar Preparación</button>`);
     } else if (order.status === 'preparing') {
-      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'ready')">Marcar Listo</button>`);
+      actions.push(`<button onclick="event.stopPropagation();window.updateOrderStatus(${order.id}, 'ready')">Marcar Listo</button>`);
     } else if (order.status === 'ready') {
-      actions.push(`<button onclick="updateOrderStatus(${order.id}, 'delivered')">Entregar</button>`);
+      actions.push(`<button onclick="event.stopPropagation();window.updateOrderStatus(${order.id}, 'delivered')">Entregar</button>`);
     }
+    if (order.status === 'pending') {
+      actions.push(`<button class="btn-danger" onclick="event.stopPropagation();window.cancelOrder(${order.id})">Cancelar</button>`);
+    }
+    if (actions.length === 0) return '';
     return `<div class="order-actions">${actions.join('')}</div>`;
   }
 
   window.updateOrderStatus = function(orderId, newStatus) {
     Orders.updateStatus(orderId, newStatus);
-    renderOrders();
+    const activeView = document.querySelector('.content-view.active');
+    if (activeView) {
+      const viewId = activeView.id;
+      if (viewId === 'ordersView') renderOrders();
+      if (viewId === 'kitchenView') renderKitchenBoard();
+    }
+    updateKitchenBadge();
+  };
+
+  window.cancelOrder = function(orderId) {
+    if (confirm('¿Cancelar este pedido?')) {
+      Orders.cancel(orderId);
+      const activeView = document.querySelector('.content-view.active');
+      if (activeView) {
+        const viewId = activeView.id;
+        if (viewId === 'ordersView') renderOrders();
+        if (viewId === 'kitchenView') renderKitchenBoard();
+      }
+      updateKitchenBadge();
+    }
   };
 
   function getStatusText(status) {
     const texts = { pending: 'Pendiente', preparing: 'En Preparación', ready: 'Listo', delivered: 'Entregado', cancelled: 'Cancelado' };
     return texts[status] || status;
+  }
+
+  window.showOrderDetail = function(orderId) {
+    const order = Orders.getOrderById(orderId);
+    if (!order) return;
+
+    const modal = document.getElementById('orderDetailModal');
+    const title = document.getElementById('orderDetailTitle');
+    const body = document.getElementById('orderDetailBody');
+
+    title.textContent = `Pedido #${order.id}`;
+
+    body.innerHTML = `
+      <div class="order-detail-header">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="status-badge ${order.status}">${getStatusText(order.status)}</span>
+          <span style="font-size:0.8rem;color:var(--gray-500)">${new Date(order.createdAt).toLocaleString('es-CO')}</span>
+        </div>
+      </div>
+      <div class="order-detail-meta">
+        <span><strong>Cliente:</strong> ${order.customer}</span>
+        <span><strong>Mesa:</strong> ${order.table}</span>
+        ${order.notes ? `<span style="grid-column:1/-1"><strong>Notas:</strong> ${order.notes}</span>` : ''}
+      </div>
+      <div class="order-detail-items">
+        <h4>Artículos</h4>
+        ${order.items.map(item => `
+          <div class="order-detail-item">
+            <span>${item.quantity}x ${item.name}</span>
+            <span>${formatCOP(item.price * item.quantity)}</span>
+          </div>
+        `).join('')}
+        <div class="order-detail-total">
+          <span>Total</span>
+          <span>${formatCOP(order.total)}</span>
+        </div>
+      </div>
+      <div class="order-timeline">
+        <h4>&#128337; Línea de tiempo</h4>
+        <div class="timeline-steps">
+          ${renderTimeline(order.statusHistory)}
+        </div>
+      </div>
+      ${Auth.hasAnyRole(['mesero', 'admin']) ? `
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
+          ${renderOrderActions(order)}
+        </div>
+      ` : ''}
+    `;
+
+    modal.classList.add('open');
+  };
+
+  function renderTimeline(history) {
+    const statusLabels = {
+      pending: 'Pedido creado',
+      preparing: 'En preparación',
+      ready: 'Listo para entregar',
+      delivered: 'Entregado',
+      cancelled: 'Cancelado'
+    };
+
+    const steps = ['pending', 'preparing', 'ready', 'delivered'];
+    const currentIndex = history.length > 0 ? steps.indexOf(history[history.length - 1].status) : -1;
+
+    return history.map((entry, i) => {
+      const stepIndex = steps.indexOf(entry.status);
+      const isLast = i === history.length - 1;
+      const cls = entry.status === 'cancelled' ? 'cancelled' : (isLast ? 'active' : 'completed');
+      return `
+        <div class="timeline-step ${cls}">
+          <div class="step-status">${statusLabels[entry.status] || entry.status}</div>
+          <div class="step-time">${new Date(entry.timestamp).toLocaleString('es-CO')}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function loadKitchenView() {
+    renderKitchenStats();
+    renderKitchenBoard();
+  }
+
+  function renderKitchenStats() {
+    const stats = document.getElementById('kitchenStats');
+    stats.innerHTML = `
+      <div class="kitchen-stat">
+        <span>&#9201;</span>
+        <span>Pendientes</span>
+        <span class="stat-count" id="statPending">${Orders.getPendingCount()}</span>
+      </div>
+      <div class="kitchen-stat">
+        <span>&#128295;</span>
+        <span>Preparando</span>
+        <span class="stat-count" id="statPreparing" style="color:var(--dark-light)">${Orders.getInProgressCount()}</span>
+      </div>
+      <div class="kitchen-stat">
+        <span>&#9989;</span>
+        <span>Listos</span>
+        <span class="stat-count" id="statReady" style="color:#2d6a4f">${Orders.getReadyCount()}</span>
+      </div>
+    `;
+  }
+
+  function renderKitchenBoard() {
+    const board = document.getElementById('kitchenBoard');
+    const columns = [
+      { status: 'pending', label: 'Pendientes', icon: '&#9201;' },
+      { status: 'preparing', label: 'En Preparación', icon: '&#128295;' },
+      { status: 'ready', label: 'Listos', icon: '&#9989;' }
+    ];
+
+    board.innerHTML = columns.map(col => {
+      const orders = Orders.getOrders({ status: col.status });
+      return `
+        <div class="kitchen-column">
+          <div class="kitchen-column-header ${col.status}">
+            ${col.icon} ${col.label} (${orders.length})
+          </div>
+          <div class="kitchen-column-orders" id="kitchenCol${col.status}">
+            ${orders.length === 0 ? '<div class="kitchen-column-empty">No hay pedidos</div>' : orders.map(o => `
+              <div class="kitchen-order-card" onclick="window.showOrderDetail(${o.id})">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span class="kitchen-order-id">#${o.id}</span>
+                  <span class="kitchen-order-table">Mesa ${o.table}</span>
+                </div>
+                <div class="kitchen-order-items">
+                  ${o.items.slice(0, 3).map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                  ${o.items.length > 3 ? ` y ${o.items.length - 3} más` : ''}
+                </div>
+                <div class="kitchen-order-time">${getTimeAgo(o.createdAt)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    renderKitchenStats();
+  }
+
+  function updateKitchenBadge() {
+    const count = Orders.getPendingCount();
+    const badge = document.getElementById('kitchenBadge');
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  }
+
+  function setupRealtimeOrders() {
+    removeRealtimeListener = Orders.onChange((data) => {
+      const activeView = document.querySelector('.content-view.active');
+      if (activeView) {
+        const viewId = activeView.id;
+        if (viewId === 'ordersView') renderOrders();
+        if (viewId === 'kitchenView') {
+          renderKitchenBoard();
+          renderKitchenStats();
+        }
+      }
+      updateKitchenBadge();
+
+      if (data && data.action === 'new') {
+        playNotificationSound();
+        showNotification(
+          '&#128276; Nuevo pedido',
+          `Pedido #${data.orderId} ha sido creado`
+        );
+      } else if (data && data.action === 'statusChange') {
+        const statusText = getStatusText(data.status);
+        showNotification(
+          '&#128240; Pedido actualizado',
+          `Pedido #${data.orderId}: ${statusText}`
+        );
+      }
+    });
+
+    document.getElementById('orderSearchInput').addEventListener('input', (e) => {
+      currentOrderSearch = e.target.value;
+      renderOrders();
+    });
+  }
+
+  function playNotificationSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.setValueAtTime(1000, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {
+    }
+  }
+
+  function showNotification(title, text) {
+    const container = document.getElementById('notificationToast');
+    const item = document.createElement('div');
+    item.className = 'notification-toast-item';
+    item.innerHTML = `
+      <div class="notification-toast-title">${title}</div>
+      <div class="notification-toast-text">${text}</div>
+    `;
+    item.addEventListener('click', () => item.remove());
+    container.appendChild(item);
+    setTimeout(() => {
+      if (item.parentNode) item.remove();
+    }, 3500);
   }
 
   function loadReservationsView() {
@@ -363,10 +637,10 @@
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const result = Auth.login(username, password);
-        if (result.success) {
+        if (result) {
           showMainView();
         } else {
-          document.getElementById('loginError').textContent = result.message;
+          document.getElementById('loginError').textContent = 'Usuario o contraseña inválidos';
         }
       });
     }
@@ -395,6 +669,19 @@
         showCheckoutModal();
       });
     }
+
+    const closeOrderDetail = document.getElementById('closeOrderDetail');
+    if (closeOrderDetail) {
+      closeOrderDetail.addEventListener('click', () => {
+        document.getElementById('orderDetailModal').classList.remove('open');
+      });
+    }
+
+    document.getElementById('orderDetailModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        document.getElementById('orderDetailModal').classList.remove('open');
+      }
+    });
   }
 
   function showCheckoutModal() {
@@ -432,7 +719,7 @@
       e.preventDefault();
       const order = Orders.create({
         customer: document.getElementById('customerName').value,
-        table: document.getElementById('tableNumber').value,
+        table: parseInt(document.getElementById('tableNumber').value),
         notes: document.getElementById('orderNotes').value,
         items: [...cart],
         total: cart.reduce((s, i) => s + i.price * i.quantity, 0)
@@ -443,7 +730,20 @@
       updateCartUI();
       closeCartSidebar();
       modal.classList.remove('open');
-      alert('Pedido #' + order.id + ' creado exitosamente');
+
+      playNotificationSound();
+
+      const successHtml = `
+        <div class="success-content">
+          <div class="success-icon">&#9989;</div>
+          <h3>¡Pedido Confirmado!</h3>
+          <p>Pedido #${order.id} creado exitosamente</p>
+          <button onclick="document.getElementById('modal').classList.remove('open')" class="confirm-btn">Cerrar</button>
+        </div>
+      `;
+      modalTitle.textContent = 'Pedido Exitoso';
+      modalBody.innerHTML = successHtml;
+      modal.classList.add('open');
     });
 
     document.getElementById('closeModal').addEventListener('click', () => {

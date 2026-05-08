@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Exquisito al Paladar - Restaurante</title>
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/modules/auth.css">
+  <link rel="stylesheet" href="../css/modules/menu.css">
+  <link rel="stylesheet" href="../css/modules/orders.css">
+  <link rel="stylesheet" href="../css/modules/reservations.css">
+  <link rel="stylesheet" href="../css/modules/reports.css">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -110,6 +115,52 @@
     <span>&#128221;</span>
   </button>
 
+  <button id="trackingFloatBtn" class="tracking-float-btn">&#128269;</button>
+  <button id="reservationFloatBtn" class="reservation-float-btn">&#128197;</button>
+  <button id="cashFloatBtn" class="cash-float-btn">&#128176;</button>
+
+  <div id="trackingModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Seguimiento de Pedidos</h3>
+        <button class="close-btn" onclick="document.getElementById('trackingModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="trackingModalContent" class="tracking-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando pedidos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reservationModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Reservas por Fecha y Hora</h3>
+        <button class="close-btn" onclick="document.getElementById('reservationModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="reservationModalContent" class="reservation-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando reservas...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cashReportModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Cierre de Caja y Reportes Diarios</h3>
+        <button class="close-btn" onclick="document.getElementById('cashReportModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cashReportModalContent" class="cash-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando reportes...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="ordersModal" class="modal">
     <div class="modal-content orders-content">
       <div class="modal-header">
@@ -178,5 +229,6 @@
   </footer>
 
   <script src="../js/script.js"></script>
+  <script src="../js/float-buttons.js"></script>
 </body>
 </html>

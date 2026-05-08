@@ -1199,7 +1199,484 @@ body {
   }
 }
 
-/* Scrollbar */
+/* Float Button - Seguimiento de pedidos */
+.tracking-float-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 8rem;
+  width: 50px;
+  height: 50px;
+  background: var(--dark-light);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tracking-float-btn:hover {
+  transform: scale(1.1);
+  background: var(--dark);
+}
+
+.tracking-float-btn::after {
+  content: 'Seguimiento de pedidos';
+  position: absolute;
+  right: 60px;
+  background: var(--dark);
+  color: var(--white);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  pointer-events: none;
+}
+
+.tracking-float-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Float Button - Reservas por fecha y hora */
+.reservation-float-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 14rem;
+  width: 50px;
+  height: 50px;
+  background: var(--secondary);
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reservation-float-btn:hover {
+  transform: scale(1.1);
+  background: #e68a00;
+}
+
+.reservation-float-btn::after {
+  content: 'Reservas por fecha y hora';
+  position: absolute;
+  right: 60px;
+  background: var(--dark);
+  color: var(--white);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  pointer-events: none;
+}
+
+.reservation-float-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Float Button - Cierre de caja y reportes diarios */
+.cash-float-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 20rem;
+  width: 50px;
+  height: 50px;
+  background: #2d6a4f;
+  color: var(--white);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cash-float-btn:hover {
+  transform: scale(1.1);
+  background: #1b5e20;
+}
+
+.cash-float-btn::after {
+  content: 'Cierre de caja y reportes';
+  position: absolute;
+  right: 60px;
+  background: var(--dark);
+  color: var(--white);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+  pointer-events: none;
+}
+
+.cash-float-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal - Seguimiento de pedidos */
+#trackingModal .modal-content {
+  max-width: 550px;
+}
+
+/* Modal - Reservas por fecha y hora */
+#reservationModal .modal-content {
+  max-width: 500px;
+}
+
+/* Modal - Cierre de caja y reportes diarios */
+#cashReportModal .modal-content {
+  max-width: 520px;
+}
+
+/* ===================== TRACKING MODAL INNER ===================== */
+.tracking-search {
+  padding: 1rem 1.25rem 0;
+}
+
+.tracking-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.tracking-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.tracking-results {
+  padding: 0.75rem 1.25rem 1.25rem;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.modal-empty {
+  text-align: center;
+  color: var(--gray-500);
+  padding: 2rem;
+}
+
+.tracking-card {
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--gray-300);
+}
+
+.tracking-card.status-pending { border-left-color: var(--secondary); }
+.tracking-card.status-preparing { border-left-color: var(--dark-light); }
+.tracking-card.status-ready { border-left-color: #2d6a4f; }
+.tracking-card.status-delivered { border-left-color: var(--dark); }
+
+.tracking-card-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-card-hdr strong {
+  color: var(--dark);
+}
+
+.tracking-status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.tracking-status-badge.pending { background: #fff3cd; color: #856404; }
+.tracking-status-badge.preparing { background: #cce5ff; color: #004085; }
+.tracking-status-badge.ready { background: #d4edda; color: #155724; }
+.tracking-status-badge.delivered { background: var(--gray-200); color: var(--gray-700); }
+
+.tracking-customer {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  margin-bottom: 0.25rem;
+}
+
+.tracking-items {
+  font-size: 0.85rem;
+  color: var(--gray-700);
+  margin-bottom: 0.25rem;
+}
+
+.tracking-total {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.track-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.track-step.completed { color: #2d6a4f; }
+.track-step.current { color: var(--dark); font-weight: 600; }
+
+.track-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gray-300);
+  flex-shrink: 0;
+}
+
+.track-step.completed .track-step-dot { background: #2d6a4f; }
+.track-step.current .track-step-dot { background: var(--dark-light); box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.3); }
+
+.track-step-label {
+  white-space: nowrap;
+}
+
+/* ===================== RESERVATION MODAL INNER ===================== */
+.reservation-form {
+  padding: 1.25rem;
+}
+
+.reservation-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.reservation-list-container {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.reservation-subtitle {
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+.reservation-card-item {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+  border-left: 3px solid var(--secondary);
+}
+
+.reservation-card-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.reservation-card-hdr strong {
+  color: var(--dark);
+  font-size: 0.9rem;
+}
+
+.reservation-status {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+}
+
+.reservation-status.pending { background: #fff3cd; color: #856404; }
+.reservation-status.confirmed { background: #d4edda; color: #155724; }
+.reservation-status.cancelled { background: #f8d7da; color: #721c24; }
+
+.reservation-card-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--gray-700);
+}
+
+/* ===================== CASH REPORT MODAL INNER ===================== */
+.cash-summary {
+  padding: 1.25rem;
+}
+
+.cash-date {
+  font-size: 0.95rem;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.cash-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cash-stat-box {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  text-align: center;
+}
+
+.cash-stat-lbl {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-bottom: 0.3rem;
+}
+
+.cash-stat-num {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.cash-stat-num.cash-primary {
+  color: var(--primary);
+}
+
+.cash-closed-msg {
+  text-align: center;
+  padding: 0.5rem;
+  background: #d4edda;
+  color: #155724;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.cash-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cash-actions .confirm-btn {
+  flex: 1;
+}
+
+.cash-report-detail {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.report-section {
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.report-section h4 {
+  font-size: 1rem;
+  color: var(--dark);
+  margin-bottom: 0.5rem;
+}
+
+.report-section h5 {
+  font-size: 0.9rem;
+  color: var(--dark);
+  margin: 0.75rem 0 0.5rem;
+}
+
+.report-meta p {
+  font-size: 0.85rem;
+  color: var(--gray-700);
+  margin-bottom: 0.25rem;
+}
+
+.report-section hr {
+  border: none;
+  border-top: 1px solid var(--gray-300);
+  margin: 0.75rem 0;
+}
+
+.report-order {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.report-order:last-child {
+  border-bottom: none;
+}
+
+.report-order-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+
+.report-order-total {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.report-order-items {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+/* Responsive cash report */
+@media (max-width: 480px) {
+  .cash-stats {
+    grid-template-columns: 1fr;
+  }
+  .cash-actions {
+    flex-direction: column;
+  }
+  .reservation-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -1229,4 +1706,41 @@ body {
   font-size: 3rem;
   display: block;
   margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .tracking-float-btn {
+    bottom: 7rem;
+  }
+
+  .reservation-float-btn {
+    bottom: 12rem;
+  }
+
+  .cash-float-btn {
+    bottom: 17rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tracking-float-btn {
+    bottom: 6.5rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+
+  .reservation-float-btn {
+    bottom: 11rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+
+  .cash-float-btn {
+    bottom: 15.5rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
 }

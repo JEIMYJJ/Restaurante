@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exquisito al Paladar - Pedidos</title>
+  <link rel="stylesheet" href="../css/modules/orders.css">
+  <link rel="stylesheet" href="../css/orders-page.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="orders-container">
+    <div class="orders-card">
+      <div class="orders-header">
+        <span class="orders-logo">&#127860;</span>
+        <h1>Exquisito al Paladar</h1>
+        <p class="orders-subtitle">Registro y Seguimiento de Pedidos en Tiempo Real</p>
+      </div>
+
+      <div class="orders-tabs">
+        <button class="orders-tab active" data-tab="new">Nuevo Pedido</button>
+        <button class="orders-tab" data-tab="tracking">
+          Seguimiento
+          <span id="trackingBadge" class="orders-badge" style="display:none">0</span>
+        </button>
+      </div>
+
+      <div class="orders-forms">
+        <div id="newOrderForm" class="orders-form active">
+          <div class="form-group">
+            <label>Nombre del cliente</label>
+            <input type="text" id="customerName" required placeholder="Nombre del cliente">
+          </div>
+          <div class="form-group">
+            <label>Número de mesa</label>
+            <input type="number" id="tableNumber" required min="1" max="50" placeholder="Ej: 5">
+          </div>
+          <div class="form-group">
+            <label>Seleccionar platos</label>
+            <div id="menuSelection" class="menu-selection"></div>
+          </div>
+          <div id="selectedItems" class="selected-items">
+            <h4>Platos seleccionados</h4>
+            <div id="selectedList"></div>
+            <div class="selected-total">
+              <span>Total:</span>
+              <span id="orderTotal">$0</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notas adicionales</label>
+            <textarea id="orderNotes" rows="2" placeholder="Alguna indicación especial..."></textarea>
+          </div>
+          <div id="orderError" class="error-message"></div>
+          <div id="orderSuccess" class="success-message"></div>
+          <button id="createOrderBtn" class="orders-btn" disabled>Confirmar Pedido</button>
+        </div>
+
+        <div id="trackingForm" class="orders-form">
+          <div class="tracking-header">
+            <div class="live-indicator">
+              <span class="live-dot"></span>
+              <span>En vivo</span>
+            </div>
+            <div class="tracking-filters">
+              <button class="tracking-filter active" data-filter="all">Todos</button>
+              <button class="tracking-filter" data-filter="pending">Pendientes</button>
+              <button class="tracking-filter" data-filter="preparing">Preparando</button>
+              <button class="tracking-filter" data-filter="ready">Listos</button>
+            </div>
+          </div>
+          <div class="tracking-stats" id="trackingStats"></div>
+          <div id="trackingList" class="tracking-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="orderDetailModal" class="orders-modal">
+    <div class="orders-modal-content">
+      <div class="orders-modal-header">
+        <h3 id="orderDetailTitle">Detalle del Pedido</h3>
+        <button id="closeOrderDetail" class="close-btn">&times;</button>
+      </div>
+      <div id="orderDetailBody" class="orders-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/menu.js"></script>
+  <script src="../js/orders.js"></script>
+  <script src="../js/orders-handler.js"></script>
+</body>
+</html>

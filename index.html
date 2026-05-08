@@ -51,12 +51,17 @@
           </div>
           <div class="header-actions">
             <div id="userInfo" class="user-info"></div>
+            <button id="cartToggle" class="cart-btn">
+              &#128722;
+              <span id="cartCount" class="cart-count">0</span>
+            </button>
             <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
           </div>
         </div>
         <nav class="main-nav">
           <button class="nav-btn active" data-view="menuView">Menú</button>
           <button class="nav-btn" data-view="ordersView">Pedidos</button>
+          <button class="nav-btn admin-only" data-view="kitchenView">Cocina <span id="kitchenBadge" class="nav-notification" style="display:none">0</span></button>
           <button class="nav-btn" data-view="reservationsView">Reservas</button>
           <button class="nav-btn admin-only" data-view="menuAdminView">Admin Menú</button>
           <button class="nav-btn admin-only" data-view="reportsView">Reportes</button>
@@ -81,6 +86,14 @@
         <div id="ordersView" class="content-view">
           <div class="view-header">
             <h2>Gestión de Pedidos</h2>
+            <div class="live-indicator">
+              <span class="live-dot"></span>
+              <span>En vivo</span>
+            </div>
+            <div class="order-search">
+              <input type="text" id="orderSearchInput" placeholder="Buscar pedido...">
+            </div>
+            <a href="app/html/orders.html" target="_blank" class="filter-btn" style="text-decoration:none" title="Abrir página dedicada de pedidos">&#128279; Pedidos</a>
             <div class="order-filters">
               <button class="filter-btn active" data-filter="all">Todos</button>
               <button class="filter-btn" data-filter="pending">Pendientes</button>
@@ -90,6 +103,14 @@
             </div>
           </div>
           <div id="ordersList" class="orders-list"></div>
+        </div>
+
+        <div id="kitchenView" class="content-view">
+          <div class="kitchen-header">
+            <h2>&#127859; Cocina - Pedidos en Tiempo Real</h2>
+            <div class="kitchen-stats" id="kitchenStats"></div>
+          </div>
+          <div class="kitchen-board" id="kitchenBoard"></div>
         </div>
 
         <div id="reservationsView" class="content-view">
@@ -147,8 +168,14 @@
         </div>
       </div>
       <div id="cartOverlay" class="cart-overlay"></div>
+
+      <button id="trackingFloatBtn" class="tracking-float-btn">&#128269;</button>
+      <button id="reservationFloatBtn" class="reservation-float-btn">&#128197;</button>
+      <button id="cashFloatBtn" class="cash-float-btn">&#128176;</button>
     </div>
   </div>
+
+  <div id="notificationToast" class="notification-toast"></div>
 
   <div id="modal" class="modal">
     <div class="modal-content">
@@ -160,11 +187,64 @@
     </div>
   </div>
 
+  <div id="orderDetailModal" class="modal">
+    <div class="modal-content order-detail-content">
+      <div class="modal-header">
+        <h3 id="orderDetailTitle">Detalle del Pedido</h3>
+        <button id="closeOrderDetail" class="close-btn">&times;</button>
+      </div>
+      <div id="orderDetailBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="trackingModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Seguimiento de Pedidos</h3>
+        <button class="close-btn" onclick="document.getElementById('trackingModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="trackingModalContent" class="tracking-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando pedidos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reservationModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Reservas por Fecha y Hora</h3>
+        <button class="close-btn" onclick="document.getElementById('reservationModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="reservationModalContent" class="reservation-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando reservas...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cashReportModal" class="modal" onclick="if(event.target==this)this.classList.remove('open')">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Cierre de Caja y Reportes Diarios</h3>
+        <button class="close-btn" onclick="document.getElementById('cashReportModal').classList.remove('open')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="cashReportModalContent" class="cash-modal-body">
+          <p style="text-align:center;color:var(--gray-500);padding:2rem">Cargando reportes...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="app/js/auth.js"></script>
   <script src="app/js/menu.js"></script>
   <script src="app/js/orders.js"></script>
   <script src="app/js/reservations.js"></script>
   <script src="app/js/reports.js"></script>
+  <script src="app/js/float-buttons.js"></script>
   <script src="app/js/main.js"></script>
 </body>
 </html>

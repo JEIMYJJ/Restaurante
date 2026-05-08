@@ -30,5 +30,13 @@ const Auth = {
       return true;
     }
     return false;
+  },
+
+  hasRole(role) {
+    return this.currentUser && this.currentUser.role === role;
+  },
+
+  hasAnyRole(roles) {
+    return this.currentUser && roles.includes(this.currentUser.role);
   }
 };
