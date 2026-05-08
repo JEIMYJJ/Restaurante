@@ -1,0 +1,27 @@
+{
+  "name": "restaurante",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JEIMYJJ/Restaurante.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JEIMYJJ/Restaurante/issues"
+  },
+  "homepage": "https://github.com/JEIMYJJ/Restaurante#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}
