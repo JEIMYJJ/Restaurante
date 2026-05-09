@@ -1843,6 +1843,49 @@ body {
   margin-bottom: 1rem;
 }
 
+/* ================= ACTION BUTTONS ================= */
+.action-btn {
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--primary);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.action-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.action-btn:active {
+  transform: scale(0.97);
+}
+
+/* Botón peligro (Cerrar caja) */
+.action-btn.danger {
+  background: #d62828;
+}
+
+.action-btn.danger:hover {
+  background: #b71c1c;
+}
+
+/* Botón secundario (opcional para otros usos) */
+.action-btn.secondary {
+  background: var(--dark-light);
+}
+
+.action-btn.secondary:hover {
+  background: var(--dark);
+}
+
 @media (max-width: 768px) {
   .tracking-float-btn {
     bottom: 7rem;
