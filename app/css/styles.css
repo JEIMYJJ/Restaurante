@@ -1144,6 +1144,32 @@ body {
   font-size: 0.9rem;
 }
 
+/* ================= LOGOUT BUTTON ================= */
+.logout-btn {
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gray-300);
+  color: var(--gray-700);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.logout-btn:hover {
+  background: var(--primary);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.logout-btn:active {
+  transform: scale(0.97);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .login-float-btn {
@@ -1161,7 +1187,6 @@ body {
 
 .register-float-btn {
   right: 5.5rem;
-}
 }
 
 .header-content {
@@ -1206,7 +1231,6 @@ body {
 
 .footer-content {
   grid-template-columns: 1fr;
-}
 }
 
 @media (max-width: 480px) {
